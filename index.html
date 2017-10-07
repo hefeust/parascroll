@@ -1,0 +1,32 @@
+
+<!doctype html>
+<html>
+  <head>
+    <title>ParaScroll V1.0</title>
+  </head>
+  <body>
+    <h1>ParaScroll V1.0</h1>
+    <div id="ps" style="height: 50vh;"> </div>
+    <script src="vendor/jquery-3.2.1.min.js"></script>
+    <script src="dist/parascroll.js"></script>
+    <script>
+      $(document).ready(function() {
+        $.getJSON('parascroll/theme.json', function(theme) {
+          try {
+            // console.log(theme);
+            var container = $('#ps').get(0);
+            var ps = new ParaScroll(container, theme);
+
+            ps.run();
+
+          } catch(err) {
+            console.log(err);
+          }
+
+
+        });
+      });
+    </script>
+
+  </body>
+</html>
