@@ -3,6 +3,11 @@ import Sprite from './Sprite'
 
 export default class Layer {
 
+  /**
+   * the laye xlass
+   *
+   * @param {Object} options - from JSON theme
+   */
   constructor(options) {
     this.name = options.name
     this.velocity = options.velocity
@@ -67,9 +72,15 @@ export default class Layer {
         }
       }
 
-      this.sprites.push(new Sprite(
-        this.ssurl, this.ssimg, this.spritesCount, spriteNumber
-      ))
+        this.sprites.push(new Sprite({
+          url: this.ssurl,
+          img: this.ssimg,
+          spritesCount: this.spritesCount,
+          spriteNumber: spriteNumber,
+          layerIdx: i,
+          slotsCount : this.slotsCount,
+          layerElmClientWidth: this.elm.clientWidth
+        }))
     }
   }
 
@@ -117,16 +128,19 @@ export default class Layer {
    * so it moves by 'brlovity' amount on each frame
    */
   update() {
+     // do sprites manage their own offset ?
+     // set it up at install time !
 
     // update layer position
     this.offset -= this.velocity
 
-    if(this.offset <=   -2 * this.elm.clientWidth) {
-       this.offset += 2 *  this.elm.clientWidth
+    if(this.offset <= -2 * this.elm.clientWidth) {
+       this.offset +=  2   * this.elm.clientWidth
     }
 
     this.sprites.forEach((sprite, idx) => {
-      sprite.update(this.offset, idx)
+      // sprite.update(this.offset)
+      sprite.update(this.velocity)
     })
   }
 

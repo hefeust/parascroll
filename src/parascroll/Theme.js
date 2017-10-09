@@ -46,11 +46,14 @@ export default class Theme {
   }
 
   render() {
+
+   // this.layers[0].render()
+   // this.layers[1].render()
+   // this.layers[2].render()
+
     this.layers.forEach((layer) => {
       layer.render()
     })
   }
-
-
 
 }

@@ -5,6 +5,12 @@ import ImagesLoader from './ImagesLoader'
 
 export default class ParaScroll {
 
+  /**
+   * ParaScroll main class
+   *
+   * @param {HTMLElement} container
+   * @param {Object} settings
+   */
   constructor(container, settings) {
     this.theme = new Theme(settings.layers)
     this.display = new Display(container, settings.display)

@@ -3,44 +3,44 @@
     "width": "100vw",
     "height": "50vh",
     "background": "#0af",
-    "fps" : 10
+    "fps" : 20
   },
 
   "layers": [
     {
       "name": "floor-background",
-      "velocity": 1.5,
-      "top": "40%",
+      "velocity": 2,
+      "top": "42%",
       "left": "10%",
       "width": "80%",
       "height": "40%",
       "background": "transparent",
       "spritesheet": "parascroll/spritesheet.png",
-      "distro": [40, 60]
+      "distro": [40, 40, 20]
     },
 
     {
       "name": "floor-middle",
       "velocity": 3.5,
-      "top": "20%",
+      "top": "29%",
       "left": "5%",
       "width": "90%",
       "height": "60%",
       "background": "transparent",
       "spritesheet": "parascroll/spritesheet.png",
-      "distro": [30, 70]
+      "distro": [40, 20, 40]
     },
 
     {
       "name": "floor-foreground",
-      "velocity": 6.5,
+      "velocity": 5.5,
       "top": "0%",
       "left": "0%",
       "width": "100%",
       "height": "100%",
       "background": "transparent",
       "spritesheet": "parascroll/spritesheet.png",
-      "distro": [10, 90]
+      "distro": [20, 60, 20]
     }
   ]
 }

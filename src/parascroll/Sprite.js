@@ -8,19 +8,19 @@ export default class Sprite {
    * @param {Image} img - image data (spritesheet)
    * @param {Number} idx - sprite index into the spritesheet
    */
-  constructor(url, img, spritesCount, spriteNumber) {
-    this.url = url
-    this.img = img
-    this.spritesCount = spritesCount
-    this.spriteNumber = spriteNumber
+  constructor(options) {
     this.elm = null
-
-    console.log(spritesCount)
-    console.log([img.width, img.height])
+    this.url = options.url
+    this.img = options.img
+    this.spritesCount = options.spritesCount
+    this.spriteNumber = options.spriteNumber
+    this.layerIdx = options.layerIdx
+    this.layerElmClientWidth = options.layerElmClientWidth
+    this.slotsCount = options.slotsCount
 
     // real sprite dimensions
-    this.realWidth = img.width / spritesCount
-    this.realHeight = img.height
+    this.realWidth = this.img.width / this.spritesCount
+    this.realHeight = this.img.height
     this.realRatio = this.realWidth / this.realHeight
 
     // coordinates into layer
@@ -28,7 +28,6 @@ export default class Sprite {
     this.left = 0
     this.width = 0
     this.height = 0
-
   }
 
   /**
@@ -49,28 +48,25 @@ export default class Sprite {
     this.height = container.clientHeight
     this.width = container.clientHeight * this.realRatio
 
-    console.log('RR ' + this.realRatio)
-    console.log('CH ' + container.clientHeight)
-
-
+    this.top = 0
+    this.left = this.layerIdx * this.width
   }
 
   /**
    * update position
    *
    */
-  update(layerOffset, layerIdx) {
+  update(velocity) {
     this.top = 0
-    this.left = layerIdx * this.width + layerOffset
+    this.left -= velocity
 
-    //if(this.left + this.width < 0) {
-//      this.left = this.width * this.slotsCount + this.layerOffset
-    //}
+    if(this.left + this.width + velocity <= 0) {
+      this.left += this.width * this.slotsCount
+    }
   }
 
   /**
    * render sprite
-   *
    *
    */
   render() {
@@ -89,7 +85,5 @@ export default class Sprite {
     this.elm.style.left = this.left + 'px';
     this.elm.style.width = this.width + 'px';
     this.elm.style.height = this.height + 'px';
-
-    console.log(this.left)
   }
 }

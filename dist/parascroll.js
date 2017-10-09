@@ -1,19 +1,19 @@
 var ParaScroll = (function () {
 'use strict';
 
-var Sprite$1 = function Sprite(url, img, spritesCount, spriteNumber) {
-  this.url = url;
-  this.img = img;
-  this.spritesCount = spritesCount;
-  this.spriteNumber = spriteNumber;
+var Sprite = function Sprite(options) {
   this.elm = null;
-
-  console.log(spritesCount);
-  console.log([img.width, img.height]);
+  this.url = options.url;
+  this.img = options.img;
+  this.spritesCount = options.spritesCount;
+  this.spriteNumber = options.spriteNumber;
+  this.layerIdx = options.layerIdx;
+  this.layerElmClientWidth = options.layerElmClientWidth;
+  this.slotsCount = options.slotsCount;
 
   // real sprite dimensions
-  this.realWidth = img.width / spritesCount;
-  this.realHeight = img.height;
+  this.realWidth = this.img.width / this.spritesCount;
+  this.realHeight = this.img.height;
   this.realRatio = this.realWidth / this.realHeight;
 
   // coordinates into layer
@@ -21,7 +21,6 @@ var Sprite$1 = function Sprite(url, img, spritesCount, spriteNumber) {
   this.left = 0;
   this.width = 0;
   this.height = 0;
-
 };
 
 /**
@@ -29,7 +28,7 @@ var Sprite$1 = function Sprite(url, img, spritesCount, spriteNumber) {
  *
  * @param {HTMLElement} container
  */
-Sprite$1.prototype.installTo = function installTo (container) {
+Sprite.prototype.installTo = function installTo (container) {
   this.elm = document.createElement('div');
 
   this.elm.className = 'sprite';
@@ -42,31 +41,28 @@ Sprite$1.prototype.installTo = function installTo (container) {
   this.height = container.clientHeight;
   this.width = container.clientHeight * this.realRatio;
 
-  console.log('RR ' + this.realRatio);
-  console.log('CH ' + container.clientHeight);
-
-
+  this.top = 0;
+  this.left = this.layerIdx * this.width;
 };
 
 /**
  * update position
  *
  */
-Sprite$1.prototype.update = function update (layerOffset, layerIdx) {
+Sprite.prototype.update = function update (velocity) {
   this.top = 0;
-  this.left = layerIdx * this.width + layerOffset;
+  this.left -= velocity;
 
-  //if(this.left + this.width < 0) {
-//    this.left = this.width * this.slotsCount + this.layerOffset
-  //}
+  if(this.left + this.width + velocity <= 0) {
+    this.left += this.width * this.slotsCount;
+  }
 };
 
 /**
  * render sprite
  *
- *
  */
-Sprite$1.prototype.render = function render () {
+Sprite.prototype.render = function render () {
   var transformRatio = this.height / this.realHeight;
   var h = this.realHeight * transformRatio;
   var w = h * this.realRatio;
@@ -82,8 +78,6 @@ Sprite$1.prototype.render = function render () {
   this.elm.style.left = this.left + 'px';
   this.elm.style.width = this.width + 'px';
   this.elm.style.height = this.height + 'px';
-
-  console.log(this.left);
 };
 
 var Layer = function Layer(options) {
@@ -152,9 +146,15 @@ Layer.prototype.populate = function populate () {
       }
     }
 
-    this$1.sprites.push(new Sprite$1(
-      this$1.ssurl, this$1.ssimg, this$1.spritesCount, spriteNumber
-    ));
+      this$1.sprites.push(new Sprite({
+        url: this$1.ssurl,
+        img: this$1.ssimg,
+        spritesCount: this$1.spritesCount,
+        spriteNumber: spriteNumber,
+        layerIdx: i,
+        slotsCount : this$1.slotsCount,
+        layerElmClientWidth: this$1.elm.clientWidth
+      }));
   }
 };
 
@@ -206,16 +206,19 @@ Layer.prototype.installTo = function installTo (container, images) {
 Layer.prototype.update = function update () {
     var this$1 = this;
 
+   // do sprites manage their own offset ?
+   // set it up at install time !
 
   // update layer position
   this.offset -= this.velocity;
 
   if(this.offset <= -2 * this.elm.clientWidth) {
-     this.offset += 2 *this.elm.clientWidth;
+     this.offset +=2 * this.elm.clientWidth;
   }
 
   this.sprites.forEach(function (sprite, idx) {
-    sprite.update(this$1.offset, idx);
+    // sprite.update(this.offset)
+    sprite.update(this$1.velocity);
   });
 };
 
@@ -285,6 +288,11 @@ Theme.prototype.update = function update () {
 };
 
 Theme.prototype.render = function render () {
+
+ // this.layers[0].render()
+ // this.layers[1].render()
+ // this.layers[2].render()
+
   this.layers.forEach(function (layer) {
     layer.render();
   });
@@ -385,44 +393,10 @@ var Display = function Display(container, options) {
 		this.elm.style.backgroundColor = options.background,
 		this.elm.style.position = 'absolute';
   this.fps = options.fps;
-
 };
 
 Display.prototype.install = function install (theme, images) {
   theme.installTo(this.elm, images);
-};
-
-// possiblt deprecated
-Display.prototype.run = function run (theme) {
-    var this$1 = this;
-
-  var imgloader = new ImagesLoader();
-
-  theme.layers.forEach(function (layer) {
-    imgloader.add(layer.name, layer.ssurl);
-  });
-
-  imgloader.onsuccess(function (images) {
-    theme.layers.forEach(function (layer) {
-      var ssurl = layer.ssurl;
-      var img = images[layer.name];
-
-      layer.slots.forEach(function (slot, idx) {
-        var sprite = new Sprite(ssurl, img, slot);
-        var height = layer.elm.clientHeight;
-        var width = height;
-        var top = 0;
-        var left = height * idx;
-
-        setInterval(function () {
-          sprite.installTo(layer.elm);
-          sprite.render(top, left, height, width);
-        }, 1000 / this$1.fps);
-
-
-      });
-    });
-  });
 };
 
 var ParaScroll = function ParaScroll(container, settings) {
